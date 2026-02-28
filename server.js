@@ -8,13 +8,14 @@ require('dotenv').config();
 const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
 // ─── VERİTABANI ─────────────────────────────────────────────────
 const pool = new Pool({
@@ -553,6 +554,11 @@ app.put('/api/settings/:key', async (req, res) => {
     await addLog('settings', '⚙️', `Ayar güncellendi: ${req.params.key}`, '', '');
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+// ─── FRONTEND CATCH-ALL ───────────────────────────────────────────
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/dist/index.html'));
 });
 
 // ─── SUNUCU ───────────────────────────────────────────────────────
